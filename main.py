@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from pyrockstats.empirical import ecdf
 from pyrockstats.distrebutions import lognorm
 
+
 def main():
     file_path = Path("/media/koladik/HardDisk/StatisticData/StatisticCorData/B21-234a/B21-234a_S.mat")
     s, p = get_data(file_path)
