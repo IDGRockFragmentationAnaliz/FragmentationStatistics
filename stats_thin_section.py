@@ -16,31 +16,46 @@ def main():
         print(name)
         file_path = file_path / (name + "_S.mat")
         s, p = get_data(file_path)
-        # x пикс = 0.25 / 1000 - см
+        pix2cm = 0.25 / 1000
+        pix2m = pix2cm / 100
+        pix2m2 = pix2m ** 2
+
         dist = {
             "empirical": {},
             "lognorm": {}
         }
-        x, cdf = ecdf(s[0])
-        dist["empirical"]["cdf"] = cdf
-        dist["x"] = x
+        areas = s[0]
 
-        theta = lognorm.fit(s[0])
-        dist["lognorm"]["theta"] = theta
-        dist["lognorm"]["cdf"] = lognorm(*theta).cdf(x)
-        #
-        data[name] = theta
+        x_min = np.log10(np.min(areas))
+        x_max = np.log10(np.max(areas))
+        s = np.sum(areas)
+        bins = np.logspace(x_min, x_max, 10)
+        hist, bins = np.histogram(areas, bins)
+        bins = bins * pix2m2
+        hist = hist / (s * pix2m2)
+        data[name] = {
+            "bins": bins,
+            "hist": hist
+        }
 
-    print(data)
-    sp.io.savemat("ThinSection_lognorm_theta.mat", data)
+        # fig = plt.figure(figsize=(14, 9))
+        # axs = [fig.add_subplot(1, 1, 1)]
+        # axs[0].stairs(data[name]["hist"], data[name]["bins"], fill=True)
+        # axs[0].set_xscale('log')
+        # #axs[0].set_yscale('log')
+        # plt.show()
+        #exit()
+
+    #print(data)
+    sp.io.savemat("ThinSection_hists.mat", data)
     #
-    fig = plt.figure(figsize=(16, 4))
-    ax = [fig.add_subplot(1, 1, 1)]
-    ax[0].plot(dist["x"], dist["empirical"]["cdf"], color='black', label='2')
-    ax[0].plot(dist["x"], dist["lognorm"]["cdf"], color='blue', label='2')
-    ax[0].set_xscale('log')
-    ax[0].set_ylim((0, 1))
-    plt.show()
+    # fig = plt.figure(figsize=(16, 4))
+    # ax = [fig.add_subplot(1, 1, 1)]
+    # ax[0].plot(dist["x"], dist["empirical"]["cdf"], color='black', label='2')
+    # ax[0].plot(dist["x"], dist["lognorm"]["cdf"], color='blue', label='2')
+    # ax[0].set_xscale('log')
+    # ax[0].set_ylim((0, 1))
+    # plt.show()
 
 
 def get_data(file_path: Path):

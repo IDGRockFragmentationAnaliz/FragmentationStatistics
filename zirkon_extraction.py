@@ -44,7 +44,7 @@ def get_image_config(img_name):
         if "up8" in name_split:
             config["scale"] = 8
 
-        config["pix2um"] = config["pix"] * config["scale"] / config["um"]
+        config["pix2um"] = config["um"] / (config["pix"] * config["scale"])
         config["pix2um2"] = config["pix2um"] ** 2
         config["pix2m2"] = config["pix2um2"] / (10 ** 12)
 

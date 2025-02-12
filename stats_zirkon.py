@@ -22,18 +22,35 @@ def main():
 	for name in keys:
 		print(name)
 		areas = area_data[name]
-		theta = lognorm.fit(areas)
-		data[name] = theta
+		#theta = lognorm.fit(areas)
+		#
 
-	sp.io.savemat("Zirkons_lognorm_theta.mat", data)
+		x_min = np.log10(np.min(areas))
+		x_max = np.log10(np.max(areas))
+		s = np.sum(areas)
 
-	# fig = plt.figure(figsize=(14, 9))
-	# axs = [fig.add_subplot(1, 1, 1)]
-	# axs[0].plot(x / (10**12), cdf_e)
-	# axs[0].plot(x / (10**12), lognorm(*theta).cdf(x))
-	# axs[0].set_xscale('log')
-	# axs[0].set_ylim((0, 1))
-	# plt.show()
+		bins = np.logspace(x_min, x_max, 10)
+
+		hist, bins = np.histogram(areas, bins)
+		bins = bins / (10 ** 12)
+		hist = hist / (s / (10 ** 12))
+		print(hist)
+		data[name] = {
+			"bins": bins,
+			"hist": hist
+		}
+
+		# fig = plt.figure(figsize=(14, 9))
+		# axs = [fig.add_subplot(1, 1, 1)]
+		# axs[0].stairs(data[name]["hist"], data[name]["bins"], fill=True)
+		# axs[0].set_xscale('log')
+		# #axs[0].set_yscale('log')
+		# plt.show()
+		# exit()
+
+	sp.io.savemat("Zirkons_hists.mat", data)
+
+
 
 
 if __name__ == "__main__":
