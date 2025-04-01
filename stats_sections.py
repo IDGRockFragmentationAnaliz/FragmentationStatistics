@@ -24,6 +24,7 @@ def main():
 
         #config[]
     out_data = {}
+    out_hists_data ={}
     for image_folder in data_folder.iterdir():
         name = image_folder.name
         print(name)
@@ -56,6 +57,8 @@ def main():
         thetas = {name: (float(test.theta[0]), float(test.theta[1])) for name, test in tests.items()}
         values, e_freq = ecdf(areas)
         x = np.logspace(np.log10(xmin), np.log10(xmax), 100)
+        bins = np.logspace(np.log10(xmin), np.log10(xmax), 10)
+        hist, bins = np.histogram(areas, bins)
         
         alpha = 0.05
         data = {
@@ -79,24 +82,25 @@ def main():
         # print(ks_tests)
         print(thetas)
         # exit()
-        # s = np.sum(areas)
+        #
         # bins = np.logspace(x_min, x_max, 10)
         # hist, bins = np.histogram(areas, bins)
-    exit()
-    with open("./data/outcrops_tests.json", 'w+') as json_file:
-        json.dump(out_data, json_file, indent=4)
+    #exit()
+    # with open("./data/outcrops_tests.json", 'w+') as json_file:
+    #     json.dump(out_data, json_file, indent=4)
+        
+        s = np.sum(areas)
+        bins = bins * pix2m2
+        hist = hist / (s * pix2m2)
+
+        out_hists_data[name] = {
+            "bins": list(bins),
+            "density": list(hist),
+            "units": "m2"
+        }
     
-    #     bins = bins * pix2m2
-    #     hist = hist / (s * pix2m2)
-    #
-    #     data[name] = {
-    #         "bins": list(bins),
-    #         "density": list(hist),
-    #         "units": "m2"
-    #     }
-    #
-    # with open("data/section_hists.json", 'w') as json_file:
-    #     json.dump(data, json_file, indent=4)
+    with open("data/section_hists.json", 'w') as json_file:
+        json.dump(out_hists_data, json_file, indent=4)
 
     exit()
     #sp.io.savemat("./Section_hists.mat", data)
