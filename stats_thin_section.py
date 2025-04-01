@@ -5,57 +5,43 @@ import matplotlib.pyplot as plt
 
 from pyrockstats.empirical import ecdf
 from pyrockstats.distrebutions import lognorm
-
+import json
 
 def main():
     thin_section_folder = Path("D:/PycharmProjects/FragmentationStatistics/ThinSection")
 
     data = {}
-    for file_path in thin_section_folder.iterdir():
+    for i, file_path in enumerate(thin_section_folder.iterdir()):
         name = file_path.name
         print(name)
         file_path = file_path / (name + "_S.mat")
         s, p = get_data(file_path)
-        pix2cm = 0.25 / 1000
-        pix2m = pix2cm / 100
-        pix2m2 = pix2m ** 2
+        pix2um = 2.5
+        pix2um2 = pix2um**2
 
-        dist = {
-            "empirical": {},
-            "lognorm": {}
-        }
-        areas = s[0]
+        areas = s[2]
 
         x_min = np.log10(np.min(areas))
         x_max = np.log10(np.max(areas))
         s = np.sum(areas)
-        bins = np.logspace(x_min, x_max, 10)
+        bins = np.logspace(x_min, x_max, 20)
         hist, bins = np.histogram(areas, bins)
-        bins = bins * pix2m2
-        hist = hist / (s * pix2m2)
+        bins = bins * pix2um2
+        min_num = np.argmin(hist)
+        if hist[min_num] == 0:
+            hist = hist[0:min_num]
+            bins = bins[0:min_num+1]
+        hist = hist / (s * (pix2um2))
         data[name] = {
-            "bins": bins,
-            "hist": hist
+            "bins": list(bins),
+            "density": list(hist),
+            "units": "um"
         }
 
-        # fig = plt.figure(figsize=(14, 9))
-        # axs = [fig.add_subplot(1, 1, 1)]
-        # axs[0].stairs(data[name]["hist"], data[name]["bins"], fill=True)
-        # axs[0].set_xscale('log')
-        # #axs[0].set_yscale('log')
-        # plt.show()
-        #exit()
+    with open("data/thin_section_hists.json", 'w') as json_file:
+        json.dump(data, json_file, indent=4)
 
-    #print(data)
-    sp.io.savemat("ThinSection_hists.mat", data)
-    #
-    # fig = plt.figure(figsize=(16, 4))
-    # ax = [fig.add_subplot(1, 1, 1)]
-    # ax[0].plot(dist["x"], dist["empirical"]["cdf"], color='black', label='2')
-    # ax[0].plot(dist["x"], dist["lognorm"]["cdf"], color='blue', label='2')
-    # ax[0].set_xscale('log')
-    # ax[0].set_ylim((0, 1))
-    # plt.show()
+    #sp.io.savemat("ThinSection_hists.mat", data)
 
 
 def get_data(file_path: Path):

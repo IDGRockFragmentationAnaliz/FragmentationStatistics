@@ -32,12 +32,13 @@ def main():
 		bins = np.logspace(x_min, x_max, 10)
 
 		hist, bins = np.histogram(areas, bins)
-		bins = bins / (10 ** 12)
-		hist = hist / (s / (10 ** 12))
-		print(hist)
+		bins = bins
+		hist = hist / s
+
 		data[name] = {
-			"bins": bins,
-			"hist": hist
+			"bins": list(bins),
+			"density": list(hist),
+			"units": "um2"
 		}
 
 		# fig = plt.figure(figsize=(14, 9))
@@ -46,9 +47,11 @@ def main():
 		# axs[0].set_xscale('log')
 		# #axs[0].set_yscale('log')
 		# plt.show()
-		# exit()
+		#exit()
+	with open("data/zirkon_hists.json", 'w') as json_file:
+		json.dump(data, json_file, indent=4)
 
-	sp.io.savemat("Zirkons_hists.mat", data)
+	#sp.io.savemat("zirkons_hists.mat", data)
 
 
 

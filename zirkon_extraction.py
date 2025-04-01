@@ -22,14 +22,15 @@ def main():
         s = extract_areas(area_marks)
         s = s * config["pix2um2"]
         data[config["name"]] = s
+        
+        # fig = plt.figure(figsize=(14, 9))
+        # axs = [fig.add_subplot(1, 1, 1)]
+        # axs[0].imshow(area_marks)
+        # plt.show()
 
     print(data)
 
     sp.io.savemat("./Zirkons/Zirkon_areas.mat", data)
-    #fig = plt.figure(figsize=(14, 9))
-    #axs = [fig.add_subplot(1, 1, 1)]
-    #axs[0].imshow(area_marks)
-    #plt.show()
 
 
 def get_image_config(img_name):
