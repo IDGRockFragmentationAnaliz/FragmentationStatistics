@@ -7,6 +7,7 @@ from pyrockstats.empirical import ecdf
 from pyrockstats.distrebutions import lognorm
 import json
 
+
 def main():
     thin_section_folder = Path("D:/PycharmProjects/FragmentationStatistics/ThinSection")
 
@@ -59,7 +60,7 @@ def get_density_data(s):
 
     # Вычисляем плотность
     bin_widths = np.diff(bins)
-    rho = np.log10(hist[mask]) - np.log10(bin_widths[mask] * np.sum(s)) + 4*np.log10(pix2um)
+    rho = np.log10(hist[mask]) - np.log10(bin_widths[mask] * np.sum(s)) - 4*np.log10(pix2um)
 
     # Средние точки бинов
     s_rho = (bins[:-1] + bins[1:]) / 2
