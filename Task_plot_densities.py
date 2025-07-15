@@ -28,11 +28,12 @@ def main():
     with open("./data/lineaments_densities.json") as file:
         lineaments_densities = json.load(file)
     
-    fig = plt.figure(figsize=(12, 8))
+    fig = plt.figure(figsize=(8, 8))
     colors = ["red", "blue", "purple", "green"]
     
-    y_label_1 = r"Size-resolved number density, $\rho$, $m^{-4}$"
-    x_label_1 = "Particles area, $s$ $m^2$"
+    y_label_1 = r"$\rho$, $m^{-4}$"
+    x_label_1 = "$s$, $m^2$"
+    x_label_2 = "$d$, $m$"
     def get_line_config(i):
         _config = {
             "color": colors[i],
@@ -43,7 +44,7 @@ def main():
         return _config
     
     axs = [fig.add_subplot(1, 1, 1)]
-    fig.subplots_adjust(bottom=0.2)
+    fig.subplots_adjust(bottom=0.2, left=0.2)
     axs[0].grid(True)
     for name in zirkons_data:
         x = np.array(zirkons_data[name]["s"]) - 12
@@ -61,10 +62,12 @@ def main():
         x = np.array(lineaments_densities[name]["s"])
         y = np.array(lineaments_densities[name]["rho"])
         axs[0].plot(x, y, **get_line_config(3))
+    for i in range(4):
+        axs[0].plot(0, 0, **get_line_config(i), label=str(i+1))
     axs[0].plot([10.5, -12], [-20, 25], color="black", linestyle="--", linewidth=3, dash_capstyle='round')
     axs[0].set_xlabel(x_label_1, fontproperties=custom_font)
     axs[0].set_ylabel(y_label_1, fontproperties=custom_font)
-    
+    axs[0].legend(prop=custom_font)
     def exp_formatter(x, pos):
         return f'$10^{{{x:.0f}}}$'
 
@@ -77,10 +80,10 @@ def main():
     ax2.spines['bottom'].set_visible(True)
     ax2.xaxis.set_ticks_position('bottom')
     ax2.xaxis.set_label_position('bottom')
-    ax2.set_xlabel("Сharacteristic size, $d$ $m$", fontproperties=custom_font)
+    ax2.set_xlabel(x_label_2, fontproperties=custom_font)
     
     axs[0].xaxis.set_major_formatter(plt.FuncFormatter(exp_formatter))
-    axs[0].yaxis.set_major_formatter(plt.FuncFormatter(exp_formatter2))
+    axs[0].yaxis.set_major_formatter(plt.FuncFormatter(exp_formatter))
     ax2.xaxis.set_major_formatter(plt.FuncFormatter(exp_formatter2))
     for label in axs[0].get_xticklabels() + axs[0].get_yticklabels():
         label.set_fontproperties(custom_font)
